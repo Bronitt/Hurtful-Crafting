@@ -1,24 +1,27 @@
-package com.example.modid.proxy;
+package com.bronit.hurtfulcrafting.proxy;
 
+import com.bronit.hurtfulcrafting.Config;
+import com.bronit.hurtfulcrafting.HurtfulCrafting;
+import com.bronit.hurtfulcrafting.handler.ItemHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-public class ClientProxy extends CommonProxy {
+import java.io.File;
 
-    @Override
+public class CommonProxy {
+
     public void preInit(FMLPreInitializationEvent event) {
-        super.preInit(event);
+        HurtfulCrafting.config = new Config(new File("config/" + HurtfulCrafting.Constants.MOD_NAME + "/general.cfg"));
+        new ItemHandler();
     }
 
-    @Override
     public void init(FMLInitializationEvent event) {
-        super.init(event);
+
     }
 
-    @Override
     public void postInit(FMLPostInitializationEvent event) {
-        super.postInit(event);
+
     }
 
 }
