@@ -27,7 +27,7 @@ public class Healer extends Item {
     public Healer() {
         super();
         this.setCreativeTab(CreativeTabs.TOOLS);
-        this.setMaxStackSize(1);
+        this.setMaxStackSize(16);
 
         this.setTranslationKey(name);
 
@@ -42,7 +42,7 @@ public class Healer extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        if (handIn.equals(EnumHand.MAIN_HAND)) {
+        if (handIn.equals(EnumHand.MAIN_HAND) && playerIn.getMaxHealth() < 20) {
             playerIn.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(playerIn.getMaxHealth() + HurtfulCrafting.config.heal);
             playerIn.getHeldItem(EnumHand.MAIN_HAND).setCount(playerIn.getHeldItem(EnumHand.MAIN_HAND).getCount() - 1);
         }

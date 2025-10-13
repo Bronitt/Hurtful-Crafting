@@ -1,36 +1,34 @@
 package com.bronit.hurtfulcrafting.handler;
 
+import com.bronit.hurtfulcrafting.GhostPlayersData;
 import com.bronit.hurtfulcrafting.HurtfulCrafting;
-import com.bronit.hurtfulcrafting.HurtfulCrafting.Constants;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.PlayerCapabilities;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class EventHandler {
 
-    private static final Map<UUID, BlockPos> db = new HashMap<>();
-    public static final String dbPath = "saves/" + HurtfulCrafting.worldName + "/data/hurtfulcrafting/db.json";
+    private static GhostPlayersData db;
 
     @SubscribeEvent
     public static void craftingEvent(PlayerEvent.ItemCraftedEvent event) {
+        db = GhostPlayersData.get(event.player.getEntityWorld());
+        NBTTagCompound temp = new NBTTagCompound();
+        temp = db.writeToNBT(temp);
+        HurtfulCrafting.LOGGER.info(((NBTTagCompound) temp.getTag("players")).getKeySet());
         EntityPlayer player = event.player;
         float health = player.getMaxHealth();
         if (health > 1f) {
@@ -39,61 +37,70 @@ public class EventHandler {
             }
             player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health - HurtfulCrafting.config.damage);
         } else {
-            player.setGameType(GameType.ADVENTURE);
-            PlayerCapabilities capabilities = player.capabilities;
-            capabilities.disableDamage = true;
-            db.put(EntityPlayer.getUUID(player.getGameProfile()), player.getPosition());
+            player.setGameType(GameType.SURVIVAL);
+            player.capabilities.disableDamage = true;
+            player.capabilities.allowEdit = false;
+
+            Map<Integer, ItemStack> inventory = new HashMap<>();
+
+            InventoryPlayer inv = player.inventory;
+            for (int i = 0; i < inv.getSizeInventory(); i++) {
+                inventory.put(i, inv.getStackInSlot(i));
+            }
+
+            Map<Integer, ArrayList<String>> map = new HashMap<>();
+
+            for (int i = 0; i < inventory.values().size(); i++) {
+                ArrayList<String> item = new ArrayList<>();
+                item.add(inventory.get(i).getDisplayName());
+                item.add("" + inventory.get(i).getCount());
+                item.add(inventory.get(i).getMetadata() + "");
+                map.put(i, item);
+            }
+
+            HurtfulCrafting.LOGGER.info(map);
+
+            NBTTagCompound nbt = new NBTTagCompound();
+            nbt = db.writeToNBT(nbt);
+            NBTTagCompound playersMap = (NBTTagCompound) nbt.getTag("players");
+            NBTTagCompound playerPos = new NBTTagCompound();
+            playerPos.setInteger("x", player.getPosition().getX());
+            playerPos.setInteger("y", player.getPosition().getY());
+            playerPos.setInteger("z", player.getPosition().getZ());
+            playersMap.setTag(EntityPlayer.getUUID(player.getGameProfile()).toString(), playerPos);
+            nbt.setTag("players", playersMap);
+            db.readFromNBT(nbt);
+
+
+//            nbt = db.writeToNBT(nbt);
+//            Set<String> set = ((NBTTagCompound) nbt.getTag("players")).getKeySet();
+//            HurtfulCrafting.LOGGER.info(set);
+//            MinecraftServer server = event.player.getServer();
+//            if (server != null) {
+//                for (String uuid : set) {
+//                    GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(UUID.fromString(uuid));
+//                    HurtfulCrafting.LOGGER.info(profile.getName() + " gggggggggg");
+//                    if (profile.getName().equals(event.player.getName())) {
+//                        HurtfulCrafting.LOGGER.info("HAPPY");
+//                        break;
+//                    }
+//                }
+//            }
+
         }
-        write(UUID.randomUUID(), new BlockPos(0, 0, 0));
     }
 
     @SubscribeEvent
-    public static void playerInteract(PlayerInteractEvent event) {
-
-        if (db.get(EntityPlayer.getUUID(((EntityPlayer) event.getEntity()).getGameProfile())) != null) {
-            event.getEntityPlayer().closeScreen();
-        }
-
-    }
-
-//    private static Map<UUID, BlockPos> read() {
-//        GsonBuilder bulder = new GsonBuilder();
-//        Gson gson = bulder.create();
-//        try (FileReader reader = new FileReader(Constants.DB_FILE)) {
-//
-//            JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
-//            JsonObject playersObject = jsonObject.getAsJsonObject("players");
-//            Map<UUID, BlockPos> playersMap = new HashMap<>();
-//
-//            playersObject.entrySet().forEach(entry ->
-//                    playersMap.put(UUID.fromString(entry.getKey()), new BlockPos(entry.getValue()))
-//            );
-//            db = playersMap;
-//            return db;
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return db;
-//    }
-
-    private static void write(UUID uuid, BlockPos playerPos) {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-//        Map<UUID, BlockPos> map = read();
-//        map.put(uuid, playerPos);
-
-        File file = new File(dbPath);
-        if (!file.exists()) file.mkdir();
-        try (FileWriter writer = new FileWriter(file)) {
-
-            JsonObject jsonObject = new JsonObject();
-
-//            jsonObject.add("players", gson.toJsonTree(map));
-//            gson.toJson(jsonObject);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void blockPlace(BlockEvent.EntityPlaceEvent event) {
+        if(event.getEntity() instanceof EntityPlayer) {
+            NBTTagCompound nbt = new NBTTagCompound();
+            nbt = db.writeToNBT(nbt);
+            NBTTagCompound players = (NBTTagCompound) nbt.getTag("players");
+            for (int i = 0; i < players.getSize(); i++) {
+                if (EntityPlayer.getUUID(((EntityPlayer) event.getEntity()).getGameProfile()).toString().equals(players.getKeySet().toArray()[i])) {
+                    HurtfulCrafting.LOGGER.info("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
+                }
+            }
         }
     }
 

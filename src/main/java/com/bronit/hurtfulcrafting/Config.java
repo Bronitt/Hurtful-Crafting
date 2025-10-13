@@ -19,8 +19,8 @@ public class Config {
         try  {
             category = "settings";
             config.addCustomCategoryComment(category, "Hurtful Crafting settings");
-            this.damage = config.getInt("damageAmount", category, 1, 0, Integer.MAX_VALUE, "The damage that will be inflicted on the player during crafting");
-            this.heal = config.getInt("healAmount", category, 1, 0, Integer.MAX_VALUE, "The amount of hp that Healer restores when used");
+            this.damage = config.getInt("damageAmount", category, 1, 1, Integer.MAX_VALUE, "The damage that will be inflicted on the player during crafting");
+            this.heal = config.getInt("healAmount", category, 1, 1, Integer.MAX_VALUE, "The amount of hp that Healer restores when used");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
