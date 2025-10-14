@@ -55,7 +55,7 @@ public class HurtfulCrafting {
 
     @Mod.EventHandler
     public void onServerStart(FMLServerStartingEvent event) {
-        EventHandler.db = GhostPlayersData.get(event.getServer().getEntityWorld());
+        proxy.onServerStart(event);
     }
 
     public static class Constants {

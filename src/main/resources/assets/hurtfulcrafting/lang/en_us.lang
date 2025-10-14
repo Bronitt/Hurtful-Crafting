@@ -1,1 +1,3 @@
 item.healer.name=Healer
+
+command.low_hp.message=You have too little health to transfer
