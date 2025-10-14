@@ -15,35 +15,37 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
 @EventBusSubscriber
 public class EventHandler {
 
-    private static GhostPlayersData db;
+    public static GhostPlayersData db;
 
+    @SideOnly(Side.SERVER)
     @SubscribeEvent
     public static void craftingEvent(PlayerEvent.ItemCraftedEvent event) {
-        db = GhostPlayersData.get(event.player.getEntityWorld());
         NBTTagCompound temp = new NBTTagCompound();
         temp = db.writeToNBT(temp);
-        HurtfulCrafting.LOGGER.info(((NBTTagCompound) temp.getTag("players")).getKeySet());
-        EntityPlayer player = event.player;
-        float health = player.getMaxHealth();
+        HurtfulCrafting.LOGGER.info("Keka " + ((NBTTagCompound) temp.getTag("players")).getKeySet());
+
+        float health = event.player.getMaxHealth();
         if (health > 1f) {
-            if (!(player.getHealth() < health)) {
-                player.attackEntityFrom(DamageSource.MAGIC, HurtfulCrafting.config.damage);
+            if (!(event.player.getHealth() < health)) {
+                event.player.attackEntityFrom(DamageSource.MAGIC, HurtfulCrafting.config.damage);
             }
-            player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health - HurtfulCrafting.config.damage);
+            event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health - HurtfulCrafting.config.damage);
         } else {
-            player.setGameType(GameType.SURVIVAL);
-            player.capabilities.disableDamage = true;
-            player.capabilities.allowEdit = false;
+            event.player.setGameType(GameType.SURVIVAL);
+            event.player.capabilities.disableDamage = true;
+            event.player.capabilities.allowEdit = false;
 
             Map<Integer, ItemStack> inventory = new HashMap<>();
 
-            InventoryPlayer inv = player.inventory;
+            InventoryPlayer inv = event.player.inventory;
             for (int i = 0; i < inv.getSizeInventory(); i++) {
                 inventory.put(i, inv.getStackInSlot(i));
             }
@@ -64,13 +66,13 @@ public class EventHandler {
             nbt = db.writeToNBT(nbt);
             NBTTagCompound playersMap = (NBTTagCompound) nbt.getTag("players");
             NBTTagCompound playerPos = new NBTTagCompound();
-            playerPos.setInteger("x", player.getPosition().getX());
-            playerPos.setInteger("y", player.getPosition().getY());
-            playerPos.setInteger("z", player.getPosition().getZ());
-            playersMap.setTag(EntityPlayer.getUUID(player.getGameProfile()).toString(), playerPos);
+            playerPos.setInteger("x", event.player.getPosition().getX());
+            playerPos.setInteger("y", event.player.getPosition().getY());
+            playerPos.setInteger("z", event.player.getPosition().getZ());
+            playersMap.setTag(EntityPlayer.getUUID(event.player.getGameProfile()).toString(), playerPos);
             nbt.setTag("players", playersMap);
             db.readFromNBT(nbt);
-
+            db.markDirty();
 
 //            nbt = db.writeToNBT(nbt);
 //            Set<String> set = ((NBTTagCompound) nbt.getTag("players")).getKeySet();
