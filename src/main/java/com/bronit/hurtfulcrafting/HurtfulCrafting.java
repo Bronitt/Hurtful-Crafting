@@ -1,7 +1,6 @@
 package com.bronit.hurtfulcrafting;
 
 import com.bronit.hurtfulcrafting.HurtfulCrafting.Constants;
-import com.bronit.hurtfulcrafting.handler.EventHandler;
 import com.bronit.hurtfulcrafting.proxy.CommonProxy;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,8 +10,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.File;
 
 @Mod(
         modid = Constants.MOD_ID,

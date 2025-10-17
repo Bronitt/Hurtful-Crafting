@@ -3,8 +3,8 @@ package com.bronit.hurtfulcrafting.proxy;
 import com.bronit.hurtfulcrafting.Config;
 import com.bronit.hurtfulcrafting.GhostPlayersData;
 import com.bronit.hurtfulcrafting.HurtfulCrafting;
+import com.bronit.hurtfulcrafting.event.CraftingEvent;
 import com.bronit.hurtfulcrafting.handler.CommandHandler;
-import com.bronit.hurtfulcrafting.handler.EventHandler;
 import com.bronit.hurtfulcrafting.handler.ItemHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -29,7 +29,10 @@ public class CommonProxy {
     }
 
     public void onServerStart(FMLServerStartingEvent event) {
-        EventHandler.db = GhostPlayersData.get(event.getServer().getEntityWorld());
+        CraftingEvent.db = GhostPlayersData.get(event.getServer().getEntityWorld());
         new CommandHandler(event);
+//        NBTTagCompound nbt = new NBTTagCompound();
+//        nbt = EventHandler.db.writeToNBT(nbt);
+//        HurtfulCrafting.LOGGER.info(((NBTTagCompound) nbt.getTag("players")).getKeySet());
     }
 }

@@ -1,36 +1,27 @@
-package com.bronit.hurtfulcrafting.handler;
+package com.bronit.hurtfulcrafting.event;
 
 import com.bronit.hurtfulcrafting.GhostPlayersData;
 import com.bronit.hurtfulcrafting.HurtfulCrafting;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.GameType;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
 @EventBusSubscriber
-public class EventHandler {
+public class CraftingEvent {
 
     public static GhostPlayersData db;
 
-    @SideOnly(Side.SERVER)
     @SubscribeEvent
     public static void craftingEvent(PlayerEvent.ItemCraftedEvent event) {
-        NBTTagCompound temp = new NBTTagCompound();
-        temp = db.writeToNBT(temp);
-        HurtfulCrafting.LOGGER.info("Keka " + ((NBTTagCompound) temp.getTag("players")).getKeySet());
 
         float health = event.player.getMaxHealth();
         if (health > 1f) {
@@ -41,7 +32,6 @@ public class EventHandler {
         } else {
             event.player.setGameType(GameType.SURVIVAL);
             event.player.capabilities.disableDamage = true;
-            event.player.capabilities.allowEdit = false;
 
             Map<Integer, ItemStack> inventory = new HashMap<>();
 
@@ -89,20 +79,6 @@ public class EventHandler {
 //                }
 //            }
 
-        }
-    }
-
-    @SubscribeEvent
-    public void blockPlace(BlockEvent.EntityPlaceEvent event) {
-        if(event.getEntity() instanceof EntityPlayer) {
-            NBTTagCompound nbt = new NBTTagCompound();
-            nbt = db.writeToNBT(nbt);
-            NBTTagCompound players = (NBTTagCompound) nbt.getTag("players");
-            for (int i = 0; i < players.getSize(); i++) {
-                if (EntityPlayer.getUUID(((EntityPlayer) event.getEntity()).getGameProfile()).toString().equals(players.getKeySet().toArray()[i])) {
-                    HurtfulCrafting.LOGGER.info("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
-                }
-            }
         }
     }
 

@@ -40,8 +40,9 @@ public class Healer extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        if (playerIn.getMaxHealth() < 20 && handIn.equals(EnumHand.MAIN_HAND)) {
-            playerIn.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(playerIn.getMaxHealth() + HurtfulCrafting.config.heal);
+        if (handIn.equals(EnumHand.MAIN_HAND)) {
+            if (playerIn.getMaxHealth() < 20) playerIn.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(playerIn.getMaxHealth() + HurtfulCrafting.config.heal);
+            playerIn.heal(1.0f);
             if (!playerIn.capabilities.isCreativeMode) playerIn.getHeldItem(EnumHand.MAIN_HAND).setCount(playerIn.getHeldItem(EnumHand.MAIN_HAND).getCount() - 1);
         }
 
