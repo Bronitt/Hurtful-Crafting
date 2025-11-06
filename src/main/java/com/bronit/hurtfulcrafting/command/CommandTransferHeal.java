@@ -1,25 +1,25 @@
 package com.bronit.hurtfulcrafting.command;
 
-import com.bronit.hurtfulcrafting.HurtfulCrafting;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.GameType;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.bronit.hurtfulcrafting.event.CraftingEvent.db;
+
 public class CommandTransferHeal extends CommandBase {
 
-    public static final String NAME = "transfer";
+    public static final String NAME = "transferheal";
 
     @Override
     public String getName() {
@@ -40,6 +40,26 @@ public class CommandTransferHeal extends CommandBase {
             if (giver.getMaxHealth() > heals) {
                 giver.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(giver.getMaxHealth() - heals);
                 recipient.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(recipient.getMaxHealth() + heals);
+                NBTTagCompound nbt = new NBTTagCompound();
+                db.writeToNBT(nbt);
+                NBTTagCompound players = (NBTTagCompound) nbt.getTag("players");
+                String uuid = EntityPlayer.getUUID(recipient.getGameProfile()).toString();
+                if (players.getKeySet().contains(uuid)) {
+                    players.removeTag(uuid);
+                    nbt.setTag("players", players);
+                    NBTTagCompound playerPos = (NBTTagCompound) players.getTag(uuid);
+                    int x = playerPos.getInteger("x");
+                    int y = playerPos.getInteger("y");
+                    int z = playerPos.getInteger("z");
+                    recipient.posX = x;
+                    recipient.posY = y;
+                    recipient.posZ = z;
+                    recipient.setPositionAndUpdate(x, y, z);
+                    db.readFromNBT(nbt);
+                    db.markDirty();
+                    recipient.setGameType(GameType.SURVIVAL);
+                    recipient.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20);
+                }
             } else giver.sendMessage(new TextComponentTranslation("command.low_hp.message"));
         }
     }

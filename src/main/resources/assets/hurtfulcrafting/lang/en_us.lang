@@ -1,3 +1,4 @@
 item.healer.name=Healer
 
 command.low_hp.message=You have too little health to transfer
+command.arise_fail.message=You aren't "died"

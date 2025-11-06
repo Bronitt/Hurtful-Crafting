@@ -1,6 +1,5 @@
 package com.bronit.hurtfulcrafting.event;
 
-import com.bronit.hurtfulcrafting.HurtfulCrafting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.world.BlockEvent;

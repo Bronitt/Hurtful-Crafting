@@ -30,27 +30,8 @@ public class CraftingEvent {
             }
             event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health - HurtfulCrafting.config.damage);
         } else {
-            event.player.setGameType(GameType.SURVIVAL);
-            event.player.capabilities.disableDamage = true;
+            event.player.setGameType(GameType.SPECTATOR);
 
-            Map<Integer, ItemStack> inventory = new HashMap<>();
-
-            InventoryPlayer inv = event.player.inventory;
-            for (int i = 0; i < inv.getSizeInventory(); i++) {
-                inventory.put(i, inv.getStackInSlot(i));
-            }
-
-            Map<Integer, ArrayList<String>> map = new HashMap<>();
-
-            for (int i = 0; i < inventory.values().size(); i++) {
-                ArrayList<String> item = new ArrayList<>();
-                item.add(inventory.get(i).getDisplayName());
-                item.add("" + inventory.get(i).getCount());
-                item.add(inventory.get(i).getMetadata() + "");
-                map.put(i, item);
-            }
-
-            HurtfulCrafting.LOGGER.info(map);
 
             NBTTagCompound nbt = new NBTTagCompound();
             nbt = db.writeToNBT(nbt);
@@ -63,21 +44,6 @@ public class CraftingEvent {
             nbt.setTag("players", playersMap);
             db.readFromNBT(nbt);
             db.markDirty();
-
-//            nbt = db.writeToNBT(nbt);
-//            Set<String> set = ((NBTTagCompound) nbt.getTag("players")).getKeySet();
-//            HurtfulCrafting.LOGGER.info(set);
-//            MinecraftServer server = event.player.getServer();
-//            if (server != null) {
-//                for (String uuid : set) {
-//                    GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(UUID.fromString(uuid));
-//                    HurtfulCrafting.LOGGER.info(profile.getName() + " gggggggggg");
-//                    if (profile.getName().equals(event.player.getName())) {
-//                        HurtfulCrafting.LOGGER.info("HAPPY");
-//                        break;
-//                    }
-//                }
-//            }
 
         }
     }

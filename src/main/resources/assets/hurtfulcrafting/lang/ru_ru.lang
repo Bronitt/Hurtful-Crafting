@@ -1,0 +1,4 @@
+item.healer.name=Хилка
+
+command.low_hp.message=Не прыгай выше головы, §4здоровья§r не хватит
+command.arise_fail.message=Ты ж, вроде, живчик, не?

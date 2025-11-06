@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GhostPlayersData extends WorldSavedData {
 
-    private static final String DATA_NAME = HurtfulCrafting.Constants.MOD_ID + "_GhostPlayers";
+    private static final String DATA_NAME = Tags.MOD_ID + "_GhostPlayers";
     public NBTTagCompound players = new NBTTagCompound();
 
     public GhostPlayersData() {

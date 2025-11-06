@@ -1,6 +1,5 @@
 package com.bronit.hurtfulcrafting.proxy;
 
-import com.bronit.hurtfulcrafting.handler.ItemHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
