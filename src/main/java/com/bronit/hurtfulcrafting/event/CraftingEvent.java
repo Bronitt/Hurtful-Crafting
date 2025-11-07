@@ -4,8 +4,6 @@ import com.bronit.hurtfulcrafting.GhostPlayersData;
 import com.bronit.hurtfulcrafting.HurtfulCrafting;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.GameType;
@@ -15,6 +13,8 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 import java.util.*;
 
+import static com.bronit.hurtfulcrafting.HurtfulCrafting.LOGGER;
+
 @EventBusSubscriber
 public class CraftingEvent {
 
@@ -22,14 +22,16 @@ public class CraftingEvent {
 
     @SubscribeEvent
     public static void craftingEvent(PlayerEvent.ItemCraftedEvent event) {
-
+        LOGGER.info("START CRAFT EVENT");
         float health = event.player.getMaxHealth();
         if (health > 1f) {
+            LOGGER.info("DAMAGE");
             if (!(event.player.getHealth() < health)) {
                 event.player.attackEntityFrom(DamageSource.MAGIC, HurtfulCrafting.config.damage);
             }
             event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health - HurtfulCrafting.config.damage);
         } else {
+            LOGGER.info("GOST MODE");
             event.player.setGameType(GameType.SPECTATOR);
 
 

@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.GameType;
 
+import static com.bronit.hurtfulcrafting.HurtfulCrafting.LOGGER;
 import static com.bronit.hurtfulcrafting.event.CraftingEvent.db;
 
 public class CommandArise extends CommandBase {
@@ -35,9 +36,9 @@ public class CommandArise extends CommandBase {
             NBTTagCompound players = (NBTTagCompound) nbt.getTag("players");
             String uuid = EntityPlayer.getUUID(player.getGameProfile()).toString();
             if (players.getKeySet().contains(uuid)) {
-                players.removeTag(uuid);
                 nbt.setTag("players", players);
                 NBTTagCompound playerPos = players.getCompoundTag(uuid);
+                players.removeTag(uuid);
                 int x = playerPos.getInteger("x");
                 int y = playerPos.getInteger("y");
                 int z = playerPos.getInteger("z");

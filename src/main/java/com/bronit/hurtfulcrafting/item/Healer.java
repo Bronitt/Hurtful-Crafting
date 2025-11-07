@@ -49,9 +49,9 @@ public class Healer extends Item {
         NBTTagCompound players = (NBTTagCompound) nbt.getTag("players");
         String uuid = EntityPlayer.getUUID(playerIn.getGameProfile()).toString();
         if (players.getKeySet().contains(uuid)) {
-            players.removeTag(uuid);
             nbt.setTag("players", players);
             NBTTagCompound playerPos = (NBTTagCompound) players.getTag(uuid);
+            players.removeTag(uuid);
             int x = playerPos.getInteger("x");
             int y = playerPos.getInteger("y");
             int z = playerPos.getInteger("z");
